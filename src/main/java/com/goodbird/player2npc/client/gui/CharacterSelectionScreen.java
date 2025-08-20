@@ -23,7 +23,7 @@ public class CharacterSelectionScreen extends Screen {
         this.clearChildren();
         isLoading = true;
 
-        CompletableFuture.supplyAsync(()->CharacterUtils.requestCharacters("player2-ai-npc-minecraft"))
+        CompletableFuture.supplyAsync(()->CharacterUtils.requestCharacters())
                 .thenAcceptAsync(result -> {
                     this.characters = result;
                     this.isLoading = false;

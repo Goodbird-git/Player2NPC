@@ -2,6 +2,8 @@ package com.goodbird.player2npc.companion;
 
 import adris.altoclef.AltoClefController;
 import adris.altoclef.player2api.Character;
+import adris.altoclef.player2api.EventQueueManager;
+import adris.altoclef.player2api.Player2APIService;
 import adris.altoclef.player2api.utils.CharacterUtils;
 import baritone.api.IBaritone;
 import baritone.api.entity.IAutomatone;
@@ -79,10 +81,10 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         // We initialize the altoclef controller ONLY ON CLIENT SIDE!
         if (!getWorld().isClient) {
             // We get the baritone (automatone) instance assigned to this automatone and create the controller
-            controller = new AltoClefController(IBaritone.KEY.get(this));
-            controller.getAiBridge().setPlayer2GameId(PLAYER2_GAME_ID); // Setting the game id (for Player2)
             if (character != null) { // If we have a character stored, we initialize the controller with it and make the automatone to greet the player
-                controller.getAiBridge().sendGreeting(character);
+                this.controller = new AltoClefController(IBaritone.KEY.get(this), character);
+                Player2APIService.setPlayer2GameID(PLAYER2_GAME_ID);
+                EventQueueManager.sendGreeting(this.controller, character);
             }
         }
     }
@@ -123,7 +125,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         if (character == null && tag.contains("character")) { // If we have a character stored, we read it and initialize the controller with it
             NbtCompound compound = tag.getCompound("character");
             character = CharacterUtils.readFromNBT(compound);
-            controller.getAiBridge().sendGreeting(character);
+            EventQueueManager.sendGreeting(controller, character);
         }
     }
 
@@ -280,6 +282,6 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         if (character == null) {
             return super.getDisplayName();
         }
-        return Text.literal(character.shortName);
+        return Text.literal(character.shortName());
     }
 }
