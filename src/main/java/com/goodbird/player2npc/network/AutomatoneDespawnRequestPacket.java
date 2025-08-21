@@ -51,6 +51,6 @@ public class AutomatoneDespawnRequestPacket implements FabricPacket {
 
     public static void handle(MinecraftServer var1, ServerPlayerEntity var2, ServerPlayNetworkHandler var3, PacketByteBuf var4, PacketSender var5) {
         AutomatoneDespawnRequestPacket packet = new AutomatoneDespawnRequestPacket(var4);
-        var1.execute(() -> CompanionManager.KEY.get(var2).dismissCompanion(packet.character.name));
+        var1.execute(() -> CompanionManager.KEY.get(var2).dismissCompanion(packet.character.name()));
     }
 }

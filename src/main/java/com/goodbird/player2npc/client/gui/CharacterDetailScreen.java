@@ -30,14 +30,14 @@ public class CharacterDetailScreen extends Screen {
         super.init();
 
         this.addDrawableChild(ButtonWidget.builder(Text.of("Summon"), button -> {
-            System.out.println("Summoning: " + character.name);
+            System.out.println("Summoning: " + character.name());
             client.getNetworkHandler().sendPacket(AutomatoneSpawnRequestPacket.create(character));
             if (this.client != null) {
                 this.client.setScreen(null);
             }
         }).positionAndSize(this.width / 2 - 100, this.height - 100, 98, 20).build());
         this.addDrawableChild(ButtonWidget.builder(Text.of("Despawn"), button -> {
-            System.out.println("Summoning: " + character.name);
+            System.out.println("Summoning: " + character.name());
             client.getNetworkHandler().sendPacket(AutomatoneDespawnRequestPacket.create(character));
             if (this.client != null) {
                 this.client.setScreen(null);
@@ -55,16 +55,16 @@ public class CharacterDetailScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.renderBackground(graphics);
 
-        graphics.drawCenteredShadowedText(this.textRenderer, character.name, this.width / 2, 130, 0xFFFFFF);
+        graphics.drawCenteredShadowedText(this.textRenderer, character.name(), this.width / 2, 130, 0xFFFFFF);
 
         int headSize = 96;
         int headX = this.width / 2 - headSize / 2;
         int headY = 150;
-        Identifier skinId = SkinManager.getSkinIdentifier(character.skinURL);
+        Identifier skinId = SkinManager.getSkinIdentifier(character.skinURL());
         SkinManager.renderSkinHead(graphics, headX, headY, headSize, skinId);
 
         int textY = headY + headSize + 15;
-        List<StringVisitable> lines = this.textRenderer.getTextHandler().wrapLines(character.description, 200, Style.EMPTY);
+        List<StringVisitable> lines = this.textRenderer.getTextHandler().wrapLines(character.description(), 200, Style.EMPTY);
         for (StringVisitable line : lines) {
             graphics.drawCenteredShadowedText(textRenderer, line.getString(), this.width / 2, textY, 0xAAAAAA);
             textY += textRenderer.fontHeight + 2;

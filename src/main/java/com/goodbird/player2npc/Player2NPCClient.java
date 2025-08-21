@@ -1,6 +1,5 @@
 package com.goodbird.player2npc;
 
-import adris.altoclef.player2api.AICommandBridge;
 import com.goodbird.player2npc.client.gui.CharacterSelectionScreen;
 import com.goodbird.player2npc.client.render.RenderAutomaton;
 import com.goodbird.player2npc.network.AutomatonSpawnPacket;
@@ -33,7 +32,8 @@ public class Player2NPCClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             long now = System.nanoTime();
             if (now - lastHeartbeatTime > 60_000_000_000L) {
-                AICommandBridge.sendHeartbeat("player2-ai-npc-minecraft");
+                // TODO: fix
+                // AICommandBridge.sendHeartbeat("player2-ai-npc-minecraft");
                 lastHeartbeatTime = now;
             }
 

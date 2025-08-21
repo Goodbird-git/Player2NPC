@@ -39,7 +39,7 @@ public class CompanionManager implements Component, ServerTickingComponent {
 
     public void summonAllCompanionsAsync() {
         _needsToSummon = true;
-        CompletableFuture.supplyAsync(()->CharacterUtils.requestCharacters("player2-ai-npc-minecraft"), _player.getServer())
+        CompletableFuture.supplyAsync(()->CharacterUtils.requestCharacters(), _player.getServer())
                 .thenAcceptAsync(characters -> this._assignedCharacters = new ArrayList<>(Arrays.asList(characters)), _player.getServer());
     }
 
@@ -48,7 +48,7 @@ public class CompanionManager implements Component, ServerTickingComponent {
             return;
         }
 
-        List<String> assignedNames = _assignedCharacters.stream().map(c -> c.name).toList();
+        List<String> assignedNames = _assignedCharacters.stream().map(c -> c.name()).toList();
         List<String> toDismiss = new ArrayList<>();
         _companionMap.forEach((name, uuid) -> {
             if (!assignedNames.contains(name)) {
@@ -67,7 +67,7 @@ public class CompanionManager implements Component, ServerTickingComponent {
     public void ensureCompanionExists(Character character) {
         if (_player.getWorld() == null || _player.getServer() == null) return;
 
-        UUID companionUuid = _companionMap.get(character.name);
+        UUID companionUuid = _companionMap.get(character.name());
         ServerWorld world = _player.getServerWorld();
         Entity existingCompanion = (companionUuid != null) ? world.getEntity(companionUuid) : null;
 
@@ -79,14 +79,14 @@ public class CompanionManager implements Component, ServerTickingComponent {
 
         if (existingCompanion instanceof AutomatoneEntity && existingCompanion.isAlive()) {
             existingCompanion.teleport(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
-            System.out.println("Teleported existing companion: " + character.name + " for player " + _player.getName().getString());
+            System.out.println("Teleported existing companion: " + character.name() + " for player " + _player.getName().getString());
         } else {
             AutomatoneEntity newCompanion = new AutomatoneEntity(_player.getWorld(), character);
             newCompanion.refreshPositionAndAngles(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, _player.getYaw(), 0);
 
             world.spawnEntity(newCompanion);
-            _companionMap.put(character.name, newCompanion.getUuid());
-            System.out.println("Summoned new companion: " + character.name + " for player " + _player.getName().getString());
+            _companionMap.put(character.name(), newCompanion.getUuid());
+            System.out.println("Summoned new companion: " + character.name() + " for player " + _player.getName().getString());
         }
     }
 

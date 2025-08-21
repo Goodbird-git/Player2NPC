@@ -18,7 +18,7 @@ public class CharacterCardWidget extends ClickableWidget {
     private final int BACKGROUND_COLOR = 0xFF181825;
 
     public CharacterCardWidget(int x, int y, int width, int height, Character character, Consumer<Character> onClick) {
-        super(x, y, width, height, Text.of(character.name));
+        super(x, y, width, height, Text.of(character.name()));
         this.character = character;
         this.onClick = onClick;
     }
@@ -31,10 +31,10 @@ public class CharacterCardWidget extends ClickableWidget {
         int headSize = this.width - 24;
         int headX = this.getX() + 12;
         int headY = this.getY() + 42;
-        Identifier skinId = SkinManager.getSkinIdentifier(character.skinURL);
+        Identifier skinId = SkinManager.getSkinIdentifier(character.skinURL());
         SkinManager.renderSkinHead(graphics, headX, headY, headSize, skinId);
 
-        Text nameText = Text.of(character.shortName);
+        Text nameText = Text.of(character.shortName());
         int textY = this.getY() + 12;
         graphics.drawCenteredShadowedText(MinecraftClient.getInstance().textRenderer, nameText, this.getX() + this.width / 2, textY, 0xFFFFFF);
     }
