@@ -4,7 +4,10 @@ import com.goodbird.player2npc.companion.AutomatoneEntity;
 import com.goodbird.player2npc.companion.CompanionManager;
 import com.goodbird.player2npc.network.AutomatoneDespawnRequestPacket;
 import com.goodbird.player2npc.network.AutomatoneSpawnRequestPacket;
+
+import adris.altoclef.AltoClefController;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -49,6 +52,9 @@ public class Player2NPC implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             CompanionManager.KEY.get(handler.player).summonAllCompanionsAsync();
+        });
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            AltoClefController.staticServerTick(server);
         });
     }
 }

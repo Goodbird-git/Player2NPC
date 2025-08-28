@@ -13,6 +13,9 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CompanionManager implements Component, ServerTickingComponent {
 
-    public static final ComponentKey<CompanionManager> KEY =
-            ComponentRegistry.getOrCreate(new Identifier("automatone", "companion_manager"), CompanionManager.class);
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static final ComponentKey<CompanionManager> KEY = ComponentRegistry
+            .getOrCreate(new Identifier("automatone", "companion_manager"), CompanionManager.class);
 
     private final ServerPlayerEntity _player;
 
@@ -39,16 +43,17 @@ public class CompanionManager implements Component, ServerTickingComponent {
 
     public void summonAllCompanionsAsync() {
         _needsToSummon = true;
-        CompletableFuture.supplyAsync(()->CharacterUtils.requestCharacters("player2-ai-npc-minecraft"), _player.getServer())
-                .thenAcceptAsync(characters -> this._assignedCharacters = new ArrayList<>(Arrays.asList(characters)), _player.getServer());
+        CompletableFuture
+                .supplyAsync(() -> CharacterUtils.requestCharacters("player2-ai-npc-minecraft"), _player.getServer())
+                .thenAcceptAsync(characters -> this._assignedCharacters = new ArrayList<>(Arrays.asList(characters)),
+                        _player.getServer());
     }
 
     private void summonCompanions() {
         if (_assignedCharacters.isEmpty()) {
             return;
         }
-
-        List<String> assignedNames = _assignedCharacters.stream().map(c -> c.name).toList();
+        List<String> assignedNames = _assignedCharacters.stream().map(c -> c.name()).toList();
         List<String> toDismiss = new ArrayList<>();
         _companionMap.forEach((name, uuid) -> {
             if (!assignedNames.contains(name)) {
@@ -57,36 +62,40 @@ public class CompanionManager implements Component, ServerTickingComponent {
         });
         toDismiss.forEach(this::dismissCompanion);
 
-        for (Character character : _assignedCharacters) {
-            ensureCompanionExists(character);
-        }
+        this._assignedCharacters.stream().filter(character -> character != null).forEach(character -> {
+            LOGGER.info("summonCompanions for character={}", character);
+            this.ensureCompanionExists(character);
+        });
 
         _assignedCharacters.clear();
     }
 
     public void ensureCompanionExists(Character character) {
-        if (_player.getWorld() == null || _player.getServer() == null) return;
+              LOGGER.info("ensureCompanionExists for character={}", character);
+        if (_player.getWorld() == null || _player.getServer() == null)
+            return;
 
-        UUID companionUuid = _companionMap.get(character.name);
+        UUID companionUuid = _companionMap.get(character.name());
         ServerWorld world = _player.getServerWorld();
         Entity existingCompanion = (companionUuid != null) ? world.getEntity(companionUuid) : null;
 
         BlockPos spawnPos = _player.getBlockPos().add(
                 _player.getRandom().nextInt(3) - 1,
                 1,
-                _player.getRandom().nextInt(3) - 1
-        );
+                _player.getRandom().nextInt(3) - 1);
 
         if (existingCompanion instanceof AutomatoneEntity && existingCompanion.isAlive()) {
             existingCompanion.teleport(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
-            System.out.println("Teleported existing companion: " + character.name + " for player " + _player.getName().getString());
+                        System.out.println("Teleported existing companion: " + character.name() + " for player " + this._player.getName().getString());
         } else {
             AutomatoneEntity newCompanion = new AutomatoneEntity(_player.getWorld(), character);
-            newCompanion.refreshPositionAndAngles(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5, _player.getYaw(), 0);
+            newCompanion.refreshPositionAndAngles(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5,
+                    _player.getYaw(), 0);
 
             world.spawnEntity(newCompanion);
-            _companionMap.put(character.name, newCompanion.getUuid());
-            System.out.println("Summoned new companion: " + character.name + " for player " + _player.getName().getString());
+            _companionMap.put(character.name(), newCompanion.getUuid());
+            System.out.println(
+                    "Summoned new companion: " + character.name() + " for player " + _player.getName().getString());
         }
     }
 
@@ -97,7 +106,8 @@ public class CompanionManager implements Component, ServerTickingComponent {
                 Entity companion = world.getEntity(companionUuid);
                 if (companion instanceof AutomatoneEntity) {
                     companion.discard();
-                    System.out.println("Dismissed companion: " + characterName + " for player " + _player.getName().getString());
+                    System.out.println(
+                            "Dismissed companion: " + characterName + " for player " + _player.getName().getString());
                     return;
                 }
             }
@@ -112,7 +122,8 @@ public class CompanionManager implements Component, ServerTickingComponent {
 
     public List<AutomatoneEntity> getActiveCompanions() {
         List<AutomatoneEntity> companions = new ArrayList<>();
-        if (_player.getServer() == null) return companions;
+        if (_player.getServer() == null)
+            return companions;
 
         for (UUID uuid : _companionMap.values()) {
             for (ServerWorld world : _player.getServer().getWorlds()) {

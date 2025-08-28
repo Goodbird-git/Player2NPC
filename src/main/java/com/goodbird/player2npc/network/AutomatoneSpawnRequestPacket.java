@@ -15,9 +15,14 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
+
 
 public class AutomatoneSpawnRequestPacket implements FabricPacket {
-
+   private static final Logger LOGGER = LogManager.getLogger();
     public static final PacketType<AutomatonSpawnPacket> TYPE = PacketType.create(
             Player2NPC.SPAWN_REQUEST_PACKET_ID,
             AutomatonSpawnPacket::new
@@ -51,6 +56,9 @@ public class AutomatoneSpawnRequestPacket implements FabricPacket {
 
     public static void handle(MinecraftServer var1, ServerPlayerEntity var2, ServerPlayNetworkHandler var3, PacketByteBuf var4, PacketSender var5) {
         AutomatoneSpawnRequestPacket packet = new AutomatoneSpawnRequestPacket(var4);
-        var1.execute(() -> CompanionManager.KEY.get(var2).ensureCompanionExists(packet.character));
+        LOGGER.info("AutomatoneSpawnReqPacket C2S/ character={}", packet.character);
+        if(packet.character != null){
+            var1.execute(() -> CompanionManager.KEY.get(var2).ensureCompanionExists(packet.character));
+        }
     }
 }

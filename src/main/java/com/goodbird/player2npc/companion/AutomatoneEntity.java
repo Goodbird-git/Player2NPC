@@ -1,6 +1,7 @@
 package com.goodbird.player2npc.companion;
 
 import adris.altoclef.AltoClefController;
+import adris.altoclef.player2api.EventQueueManager;
 import adris.altoclef.player2api.Character;
 import adris.altoclef.player2api.utils.CharacterUtils;
 import baritone.api.IBaritone;
@@ -36,12 +37,15 @@ import net.minecraft.world.World;
 
 /**
  * We implement:
- * - IAutomatone for this entity to be counted as an automatone (used for tracking nearby automatons and such)
+ * - IAutomatone for this entity to be counted as an automatone (used for
+ * tracking nearby automatons and such)
  * - IInventoryProvider for this entity to have a player-like inventory
- * - IInteractionManagerProvider for this entity to have a player-like interaction manager (for breaking and placing blocks and using items)
+ * - IInteractionManagerProvider for this entity to have a player-like
+ * interaction manager (for breaking and placing blocks and using items)
  * - IHungerManagerProvider for this entity to have a hunger manager
  */
-public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInventoryProvider, IInteractionManagerProvider, IHungerManagerProvider {
+public class AutomatoneEntity extends LivingEntity
+        implements IAutomatone, IInventoryProvider, IInteractionManagerProvider, IHungerManagerProvider {
     // Fields to store the provided instances of inventory and such
     public LivingEntityInteractionManager manager;
     public LivingEntityInventory inventory;
@@ -77,13 +81,9 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         inventory = new LivingEntityInventory(this);
         hungerManager = new LivingEntityHungerManager();
         // We initialize the altoclef controller ONLY ON CLIENT SIDE!
-        if (!getWorld().isClient) {
-            // We get the baritone (automatone) instance assigned to this automatone and create the controller
-            controller = new AltoClefController(IBaritone.KEY.get(this));
-            controller.getAiBridge().setPlayer2GameId(PLAYER2_GAME_ID); // Setting the game id (for Player2)
-            if (character != null) { // If we have a character stored, we initialize the controller with it and make the automatone to greet the player
-                controller.getAiBridge().sendGreeting(character);
-            }
+        if (!getWorld().isClient && character != null) {
+            this.controller = new AltoClefController(IBaritone.KEY.get(this), character, PLAYER2_GAME_ID);
+            EventQueueManager.sendGreeting(this.controller, character);
         }
     }
 
@@ -94,7 +94,8 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         init();
     }
 
-    // Interface implementation (just make the getters for the managers and the inventory)
+    // Interface implementation (just make the getters for the managers and the
+    // inventory)
     @Override
     public LivingEntityInventory getLivingInventory() {
         return inventory;
@@ -120,10 +121,11 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         NbtList nbtList = tag.getList("Inventory", 10);
         this.inventory.readNbt(nbtList);
         this.inventory.selectedSlot = tag.getInt("SelectedItemSlot");
-        if (character == null && tag.contains("character")) { // If we have a character stored, we read it and initialize the controller with it
+        if (character == null && tag.contains("character")) { // If we have a character stored, we read it and
+                                                              // initialize the controller with it
             NbtCompound compound = tag.getCompound("character");
             character = CharacterUtils.readFromNBT(compound);
-            controller.getAiBridge().sendGreeting(character);
+            EventQueueManager.sendGreeting(controller, character);
         }
     }
 
@@ -146,7 +148,8 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         this.lastVelocity = this.getVelocity(); // Setting prev velocity for rendering
         manager.update();
         inventory.updateItems();
-        //hungerManager.update(this); //if you want your automatone to feel hunger - you need to uncomment that
+        // hungerManager.update(this); //if you want your automatone to feel hunger -
+        // you need to uncomment that
         lastAttackedTicks++; // Tick this for the NPC to attack (LivingEntities don't do that by default)
         if (!this.getWorld().isClient) // We tick the controller only on server side
             controller.serverTick();
@@ -167,9 +170,11 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
 
     // Pickup all the items in range of 3 blocks
     public void pickupItems() {
-        if (!this.getWorld().isClient && this.isAlive() && !this.dead && this.getWorld().getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
+        if (!this.getWorld().isClient && this.isAlive() && !this.dead
+                && this.getWorld().getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             Vec3i vec3i = new Vec3i(3, 3, 3);
-            for (ItemEntity itemEntity : this.getWorld().getNonSpectatingEntities(ItemEntity.class, this.getBoundingBox().expand((double) vec3i.getX(), (double) vec3i.getY(), (double) vec3i.getZ()))) {
+            for (ItemEntity itemEntity : this.getWorld().getNonSpectatingEntities(ItemEntity.class, this
+                    .getBoundingBox().expand((double) vec3i.getX(), (double) vec3i.getY(), (double) vec3i.getZ()))) {
                 if (!itemEntity.isRemoved() && !itemEntity.getStack().isEmpty() && !itemEntity.cannotPickup()) {
                     ItemStack itemStack = itemEntity.getStack();
                     int i = itemStack.getCount();
@@ -204,7 +209,9 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         boolean bl = target.damage(this.getDamageSources().mobAttack(this), f);
         if (bl) {
             if (g > 0.0F && target instanceof LivingEntity) {
-                ((LivingEntity) target).takeKnockback((double) (g * 0.5F), (double) MathHelper.sin(this.getYaw() * ((float) Math.PI / 180F)), (double) (-MathHelper.cos(this.getYaw() * ((float) Math.PI / 180F))));
+                ((LivingEntity) target).takeKnockback((double) (g * 0.5F),
+                        (double) MathHelper.sin(this.getYaw() * ((float) Math.PI / 180F)),
+                        (double) (-MathHelper.cos(this.getYaw() * ((float) Math.PI / 180F))));
                 this.setVelocity(this.getVelocity().multiply(0.6, (double) 1.0F, 0.6));
             }
 
@@ -239,7 +246,8 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         } else if (slot == EquipmentSlot.OFFHAND) {
             return this.inventory.offHand.get(0);
         } else {
-            return slot.getType() == EquipmentSlot.Type.ARMOR ? this.inventory.armor.get(slot.getEntitySlotId()) : ItemStack.EMPTY;
+            return slot.getType() == EquipmentSlot.Type.ARMOR ? this.inventory.armor.get(slot.getEntitySlotId())
+                    : ItemStack.EMPTY;
         }
     }
 
@@ -280,6 +288,6 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
         if (character == null) {
             return super.getDisplayName();
         }
-        return Text.literal(character.shortName);
+        return Text.literal(character.shortName());
     }
 }
