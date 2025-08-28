@@ -143,9 +143,9 @@ public class RenderAutomaton extends LivingEntityRenderer<AutomatoneEntity, Play
       if (npc.textureLocation == null) {
          try {
             boolean fixSkin = true;
-            File file = ResourceDownloader.getUrlFile(npc.getCharacter().skinURL, fixSkin);
-            npc.textureLocation = ResourceDownloader.getUrlResourceLocation(npc.getCharacter().skinURL, fixSkin);
-            this.loadSkin(file, npc.textureLocation, npc.getCharacter().skinURL, fixSkin);
+            File file = ResourceDownloader.getUrlFile(npc.getCharacter().skinURL(), fixSkin);
+            npc.textureLocation = ResourceDownloader.getUrlResourceLocation(npc.getCharacter().skinURL(), fixSkin);
+            this.loadSkin(file, npc.textureLocation, npc.getCharacter().skinURL(), fixSkin);
          } catch (Exception var4) {
             var4.printStackTrace();
          }

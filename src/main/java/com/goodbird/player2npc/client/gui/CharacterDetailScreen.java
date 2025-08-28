@@ -25,14 +25,14 @@ public class CharacterDetailScreen extends Screen {
    protected void init() {
       super.init();
       this.addRenderableWidget(Button.builder(Component.nullToEmpty("Summon"), button -> {
-         System.out.println("Summoning: " + this.character.name);
+         System.out.println("Summoning: " + this.character.name());
          AutomatoneSpawnRequestPacket.send(this.character);
          if (this.minecraft != null) {
             this.minecraft.setScreen(null);
          }
       }).bounds(this.width / 2 - 100, this.height - 100, 98, 20).build());
       this.addRenderableWidget(Button.builder(Component.nullToEmpty("Despawn"), button -> {
-         System.out.println("Summoning: " + this.character.name);
+         System.out.println("Summoning: " + this.character.name());
          AutomatoneDespawnRequestPacket.send(this.character);
          if (this.minecraft != null) {
             this.minecraft.setScreen(null);
@@ -47,15 +47,15 @@ public class CharacterDetailScreen extends Screen {
 
    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
       this.renderBackground(graphics);
-      graphics.drawCenteredString(this.font, this.character.name, this.width / 2, 130, 16777215);
+      graphics.drawCenteredString(this.font, this.character.name(), this.width / 2, 130, 16777215);
       int headSize = 96;
       int headX = this.width / 2 - headSize / 2;
       int headY = 150;
-      ResourceLocation skinId = SkinManager.getSkinIdentifier(this.character.skinURL);
+      ResourceLocation skinId = SkinManager.getSkinIdentifier(this.character.skinURL());
       SkinManager.renderSkinHead(graphics, headX, headY, headSize, skinId);
       int textY = headY + headSize + 15;
 
-      for (FormattedText line : this.font.getSplitter().splitLines(this.character.description, 200, Style.EMPTY)) {
+      for (FormattedText line : this.font.getSplitter().splitLines(this.character.description(), 200, Style.EMPTY)) {
          graphics.drawCenteredString(this.font, line.getString(), this.width / 2, textY, 11184810);
          textY += 9 + 2;
       }

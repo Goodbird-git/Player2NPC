@@ -36,7 +36,7 @@ public class AutomatoneDespawnRequestPacket {
             return;
          }
          player.getCapability(CompanionCapability.INSTANCE).ifPresent(companionManager -> {
-            companionManager.dismissCompanion(msg.character.name);
+            companionManager.dismissCompanion(msg.character.name());
          });
       });
       context.setPacketHandled(true);

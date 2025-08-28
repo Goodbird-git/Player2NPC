@@ -1,18 +1,21 @@
 package com.goodbird.player2npc.event;
 
-import altoclef.player2api.AICommandBridge;
 import com.goodbird.player2npc.Player2NPCForge;
 import com.goodbird.player2npc.capability.CompanionCapability;
 import com.goodbird.player2npc.capability.CompanionProvider;
 import com.goodbird.player2npc.client.ClientSetup;
 import com.goodbird.player2npc.client.gui.CharacterSelectionScreen;
 import com.goodbird.player2npc.companion.CompanionManager;
+
+import altoclef.AltoClefController;
+import altoclef.player2api.client.ClientHeartbeatManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -23,6 +26,12 @@ public class ForgeEvents {
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             player.getCapability(CompanionCapability.INSTANCE).ifPresent(CompanionManager::summonAllCompanionsAsync);
+        }
+    }
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event){
+        if(event.phase == Phase.END){
+            AltoClefController.staticServerTick(event.getServer());
         }
     }
 
@@ -42,11 +51,13 @@ public class ForgeEvents {
 
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
-        long now = System.nanoTime();
-        if (now - lastHeartbeatTime > 60_000_000_000L) {
-            AICommandBridge.sendHeartbeat("player2-ai-npc-minecraft");
-            lastHeartbeatTime = now;
-        }
+        ClientHeartbeatManager.onClientTick("player2-ai-npc-minecraft");
+        // long now = System.nanoTime();
+        // if (now - lastHeartbeatTime > 60_000_000_000L) {
+        //         Minecraft mc = Minecraft.getInstance();
+        //     AICommandBridge.sendHeartbeat("player2-ai-npc-minecraft");
+        //     lastHeartbeatTime = now;
+        // }
 
         if (ClientSetup.openCharacterScreenKeybind.consumeClick()) {
             Minecraft mc = Minecraft.getInstance();

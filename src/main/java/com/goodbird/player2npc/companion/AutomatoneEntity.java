@@ -2,7 +2,10 @@ package com.goodbird.player2npc.companion;
 
 import altoclef.AltoClefController;
 import altoclef.player2api.Character;
+import altoclef.player2api.Player2APIService;
 import altoclef.player2api.utils.CharacterUtils;
+import altoclef.player2api.EventQueueManager;
+import altoclef.player2api.Player2APIService;
 import baritone.api.IBaritone;
 import baritone.api.entity.IAutomatone;
 import baritone.api.entity.IHungerManagerProvider;
@@ -58,12 +61,9 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
       this.manager = new LivingEntityInteractionManager(this);
       this.inventory = new LivingEntityInventory(this);
       this.hungerManager = new LivingEntityHungerManager();
-      if (!this.level().isClientSide) {
-         this.controller = new AltoClefController((IBaritone)IBaritone.KEY.get(this));
-         this.controller.getAiBridge().setPlayer2GameId("player2-ai-npc-minecraft");
-         if (this.character != null) {
-            this.controller.getAiBridge().sendGreeting(this.character);
-         }
+      if(!this.level().isClientSide && character != null){
+         this.controller = new AltoClefController(IBaritone.KEY.get(this), character, PLAYER2_GAME_ID);
+         EventQueueManager.sendGreeting(this.controller, character);
       }
    }
 
@@ -97,7 +97,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
       if (this.character == null && tag.contains("character")) {
          CompoundTag compound = tag.getCompound("character");
          this.character = CharacterUtils.readFromNBT(compound);
-         this.controller.getAiBridge().sendGreeting(this.character);
+         EventQueueManager.sendGreeting(controller, character);
       }
    }
 
@@ -238,7 +238,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
    }
 
    public Component getDisplayName() {
-      return (Component)(this.character == null ? super.getDisplayName() : Component.literal(this.character.shortName));
+      return (Component)(this.character == null ? super.getDisplayName() : Component.literal(this.character.shortName()));
    }
 
    @Override
