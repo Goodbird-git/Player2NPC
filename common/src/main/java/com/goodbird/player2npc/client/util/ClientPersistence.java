@@ -4,14 +4,12 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import dev.architectury.platform.Platform;
 
 public class ClientPersistence {
-    private static final Path FILE = FabricLoader.getInstance()
-            .getConfigDir()
+    private static final Path FILE = Platform.getConfigFolder()
             .resolve("player2NPC-client.dat");
 
     public static void saveTTSStatus(boolean flag) {
