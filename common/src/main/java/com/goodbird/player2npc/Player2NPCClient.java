@@ -19,7 +19,6 @@ import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
-import net.fabricmc.loader.api.FabricLoader;
 
 public class Player2NPCClient {
     private static KeyMapping openCharacterScreenKeybind;
