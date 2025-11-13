@@ -138,6 +138,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
 
         super.tick();
         this.updateSwingTime();
+        this.hungerManager.update(this);
     }
 
     public void aiStep() {
@@ -255,5 +256,11 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
 
     public Component getDisplayName() {
         return (Component)(this.character == null ? super.getDisplayName() : Component.literal(this.character.shortName()));
+    }
+
+    @Override
+    protected void dropAllDeathLoot(ServerLevel serverLevel, DamageSource damageSource) {
+        super.dropAllDeathLoot(serverLevel, damageSource);
+        inventory.dropAll();
     }
 }
