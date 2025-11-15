@@ -28,6 +28,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -262,5 +263,15 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     protected void dropAllDeathLoot(ServerLevel serverLevel, DamageSource damageSource) {
         super.dropAllDeathLoot(serverLevel, damageSource);
         inventory.dropAll();
+    }
+
+    @Override
+    public void die(DamageSource damageSource) {
+        super.die(damageSource);
+        if(!level().isClientSide()) {
+            controller.getOwner().sendSystemMessage(Component.literal("Your companion "+character.shortName()+" died!"));
+            controller.getOwner().sendSystemMessage(Component.literal("It was respawned near you!"));
+            CompanionManager.get((ServerPlayer) controller.getOwner()).spawnCompanion(character);
+        }
     }
 }

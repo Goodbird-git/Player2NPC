@@ -110,13 +110,8 @@ public class CompanionManager {
                 } else {
                     LOGGER.info("ensureCompanionExists SPAWN");
                     try {
-                        AutomatoneEntity newCompanion = new AutomatoneEntity(this._player.level(), character, this._player);
-                        newCompanion.moveTo((double) spawnPos.getX() + (double) 0.5F, (double) spawnPos.getY(), (double) spawnPos.getZ() + (double) 0.5F, this._player.getYRot(), 0.0F);
-                        world.addFreshEntity(newCompanion);
-                        this._companionMap.put(character.name(), newCompanion.getUUID());
-                        PrintStream var10 = System.out;
-                        String var12 = character.name();
-                        var10.println("Summoned new companion: " + var12 + " for player " + this._player.getName().getString());
+                        spawnCompanion(character);
+                        System.out.println("Summoned new companion: " + character.name() + " for player " + this._player.getName().getString());
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -125,6 +120,14 @@ public class CompanionManager {
             }
 
         }
+    }
+
+    public void spawnCompanion(Character character){
+        BlockPos spawnPos = this._player.blockPosition().offset(this._player.getRandom().nextInt(3) - 1, 1, this._player.getRandom().nextInt(3) - 1);
+        AutomatoneEntity newCompanion = new AutomatoneEntity(this._player.level(), character, this._player);
+        newCompanion.moveTo((double) spawnPos.getX() + (double) 0.5F, (double) spawnPos.getY(), (double) spawnPos.getZ() + (double) 0.5F, this._player.getYRot(), 0.0F);
+        this._player.level().addFreshEntity(newCompanion);
+        this._companionMap.put(character.name(), newCompanion.getUUID());
     }
 
     public void dismissCompanion(String characterName) {
