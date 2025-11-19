@@ -19,10 +19,13 @@ import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
+import com.goodbird.player2npc.companion.AutomatoneEntity;
+import com.player2.playerengine.player2api.utils.STTUtils;
 
 public class Player2NPCClient {
     private static KeyMapping openCharacterScreenKeybind;
     private static KeyMapping ttsEnableKeybind;
+    private static KeyMapping sttKeybind;
     private static long lastHeartbeatTime = System.nanoTime();
 
     public Player2NPCClient() {
@@ -39,8 +42,11 @@ public class Player2NPCClient {
         // 79 => O
         ttsEnableKeybind = new KeyMapping("key.player2npc.tts_toggle", Type.KEYSYM, 79,
                 "category.player2npc.keys");
+        // 86 => V
+        sttKeybind = new KeyMapping("key.player2npc.stt_toggle", Type.KEYSYM, 86, "category.player2npc.keys");
         KeyMappingRegistry.register(openCharacterScreenKeybind);
         KeyMappingRegistry.register(ttsEnableKeybind);
+        KeyMappingRegistry.register(sttKeybind);
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register((player) -> {
             if (!ClientPersistence.getTTStatus()) {
                 player.sendSystemMessage(
@@ -62,6 +68,14 @@ public class Player2NPCClient {
                 client.player.sendSystemMessage(
                         Component.literal(PlayerEngineClient.enabledTTS ? "Enabled TTS" : "Disabled TTS"));
             }
+            if (sttKeybind.isDown()) {
+                STTUtils.setIsListening(true, AutomatoneEntity.PLAYER2_GAME_ID);
+            } else {
+                STTUtils.setIsListening(false, AutomatoneEntity.PLAYER2_GAME_ID);
+            }
+        });
+        ClientTickEvent.CLIENT_PRE.register((client) -> {
+            STTUtils.update();
         });
     }
 }
