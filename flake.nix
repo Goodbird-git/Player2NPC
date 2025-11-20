@@ -11,7 +11,7 @@
   in {
     devShells.${system}.default = pkgs.mkShell {
 	packages = with pkgs; [
-	  javaPackages.compiler.openjdk17
+	  javaPackages.compiler.openjdk21
 	];
     };
 

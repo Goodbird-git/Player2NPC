@@ -50,7 +50,7 @@ public class AutomatoneEntity extends LivingEntity implements IAutomatone, IInve
     public Character character;
     public ResourceLocation textureLocation;
     protected Vec3 lastVelocity;
-    private final String PLAYER2_GAME_ID = "player2-ai-npc-minecraft";
+    public static final String PLAYER2_GAME_ID = "player2-ai-npc-minecraft";
 
     public AutomatoneEntity(EntityType<? extends AutomatoneEntity> type, Level world) {
         super(type, world);
