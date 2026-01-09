@@ -9,7 +9,9 @@ import com.goodbird.player2npc.companion.AutomatoneEntity;
 import com.goodbird.player2npc.companion.CompanionManager;
 import com.goodbird.player2npc.network.AutomatoneDespawnRequestPacket;
 import com.goodbird.player2npc.network.AutomatoneSpawnRequestPacket;
+import com.player2.playerengine.PlayerEngine;
 import com.player2.playerengine.PlayerEngineController;
+import com.player2.playerengine.player2api.utils.Player2HTTPUtils;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.networking.NetworkManager;
@@ -54,7 +56,18 @@ public class Player2NPC {
         EntityAttributeRegistry.register(AUTOMATONE, Zombie::createAttributes);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, SPAWN_REQUEST_PACKET_ID, AutomatoneSpawnRequestPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, DESPAWN_REQUEST_PACKET_ID, AutomatoneDespawnRequestPacket::handle);
-        PlayerEvent.PLAYER_JOIN.register((player) -> CompanionManager.get(player).summonAllCompanionsAsync());
+        PlayerEvent.PLAYER_JOIN.register((player) -> {
+            // Async health check on join - will trigger reauth if 401/402
+            PlayerEngine.getExecutor().submit(() -> {
+                try {
+                    Player2HTTPUtils.sendRequest(player, "player2-ai-npc-minecraft", "/v1/health", false, null);
+                    LOGGER.info("Health check passed for player {}", player.getName().getString());
+                } catch (Exception e) {
+                    LOGGER.warn("Health check failed for player {}: {}", player.getName().getString(), e.getMessage());
+                }
+            });
+            CompanionManager.get(player).summonAllCompanionsAsync();
+        });
         PlayerEvent.PLAYER_QUIT.register((player) -> {
             CompanionManager.get(player).dismissAllCompanions();
             CompanionManager.remove(player);
