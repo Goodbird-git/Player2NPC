@@ -27,15 +27,16 @@ public class CharacterCardWidget extends AbstractWidget {
     }
 
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, -14999732);
-        graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + 30, 553648127);
-        int headSize = this.width - 24;
-        int headX = this.getX() + 12;
-        int headY = this.getY() + 42;
+        graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, 0xffafafff);
+        graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + 15, 0xff8080ff);
+        int headSize = 35;
+        int headX = this.getX() + 5;
+        int headY = this.getY() + 20;
         ResourceLocation skinId = SkinManager.getSkinIdentifier(this.character.skinURL());
+        graphics.pose().pushPose();
         SkinManager.renderSkinHead(graphics, headX, headY, headSize, skinId);
         Component nameText = Component.nullToEmpty(this.character.shortName());
-        int textY = this.getY() + 12;
+        int textY = this.getY() + 4;
         graphics.drawCenteredString(Minecraft.getInstance().font, nameText, this.getX() + this.width / 2, textY, 16777215);
     }
 
