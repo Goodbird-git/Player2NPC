@@ -41,7 +41,7 @@ subprojects {
     dependencies {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.officialMojangMappings()
-        modImplementation files('../libs/playerengine-neoforge-1.21.1-1.0.5.jar')
+        modImplementation files('../libs/playerengine-neoforge-1.21.1-1.1.11.jar')
     }
 
     java {
