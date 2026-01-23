@@ -56,7 +56,8 @@ public class Player2NPCClient {
                 player.sendSystemMessage(
                         Component.literal(
                                 "To spawn a companion, press H. (Make sure you have at least one selected characeter at player2.game)"));
-                player.sendSystemMessage(Component.literal("To toggle text to speech (TTS), press O."));
+                player.sendSystemMessage(Component.literal("To toggle text to speech (TTS), press ").append(Component.keybind("key.player2npc.tts_toggle")));
+                player.sendSystemMessage(Component.literal("To toggle speech to text (STT), press ").append(Component.keybind("key.player2npc.stt_toggle")));
                 ClientPersistence.saveTTSStatus(true);
             }
         });
