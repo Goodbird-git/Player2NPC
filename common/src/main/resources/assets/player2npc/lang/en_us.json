@@ -1,4 +1,6 @@
 {
   "key.player2npc.open_character_screen": "Open character screen",
+  "key.player2npc.stt_toggle": "Toggle Speach-To-Text",
+  "key.player2npc.tts_toggle": "Toggle Text-To-Speech",
   "category.player2npc.keys": "Player2NPC"
 }
