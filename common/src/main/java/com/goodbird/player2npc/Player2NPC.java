@@ -10,6 +10,7 @@ import com.goodbird.player2npc.companion.CompanionManager;
 import com.goodbird.player2npc.network.AutomatoneDespawnRequestPacket;
 import com.goodbird.player2npc.network.AutomatoneSpawnRequestPacket;
 import com.player2.playerengine.PlayerEngineController;
+import com.player2.playerengine.player2api.auth.AuthenticationManager;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.networking.NetworkManager;
@@ -24,6 +25,8 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.monster.Zombie;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.CompletableFuture;
 
 public class Player2NPC {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -53,11 +56,16 @@ public class Player2NPC {
         EntityAttributeRegistry.register(AUTOMATONE, Zombie::createAttributes);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, SPAWN_REQUEST_PACKET_ID, AutomatoneSpawnRequestPacket::handle);
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, DESPAWN_REQUEST_PACKET_ID, AutomatoneDespawnRequestPacket::handle);
-        PlayerEvent.PLAYER_JOIN.register((player) -> CompanionManager.get(player).summonAllCompanionsAsync());
+
+        PlayerEvent.PLAYER_JOIN.register((player) -> CompletableFuture
+                .runAsync(() -> AuthenticationManager.getInstance().checkAuth(player, AutomatoneEntity.PLAYER2_GAME_ID))
+                .thenRun(CompanionManager.get(player)::summonAllCompanionsAsync));
+
         PlayerEvent.PLAYER_QUIT.register((player) -> {
             CompanionManager.get(player).dismissAllCompanions();
             CompanionManager.remove(player);
         });
+        
         TickEvent.SERVER_POST.register(PlayerEngineController::staticServerTick);
         TickEvent.PLAYER_POST.register((player) -> {
             if (player instanceof ServerPlayer serverPlayer)
