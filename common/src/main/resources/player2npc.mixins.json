@@ -11,6 +11,5 @@
   ],
   "mixins": [
     "EntityPersistentData"
-  ],
-  "refmap": "player2npc-common-common-refmap.json"
+  ]
 }
