@@ -34,5 +34,12 @@ versionRange = "[13.0.8,)"
 ordering = "AFTER"
 side = "BOTH"
 
+[[dependencies.player2npc]]
+modId = "playerengine"
+mandatory = true
+versionRange = "[1.21.1-1.1.11,)"
+ordering = "AFTER"
+side = "BOTH"
+
 [[mixins]]
 config = "player2npc.mixins.json"
