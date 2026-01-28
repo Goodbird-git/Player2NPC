@@ -78,6 +78,11 @@ public class CharacterSelectionScreen extends Screen {
 
     }
 
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    }
+
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.renderBackground(graphics, mouseX, mouseY, delta);
         graphics.blit(ResourceLocation.bySeparator("player2npc:textures/gui/standardbg.png", ':'), (this.width-256)/2, (this.height-200)/2, 0, 0, 256, 256);

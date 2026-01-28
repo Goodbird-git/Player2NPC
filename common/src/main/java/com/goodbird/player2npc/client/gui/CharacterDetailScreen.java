@@ -57,6 +57,11 @@ public class CharacterDetailScreen extends Screen {
         }).bounds((this.width-200)/2+58, (this.height-230)/2+200, 80, 20).build());
     }
 
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    }
+
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         this.renderBackground(graphics, mouseX, mouseY, delta);
         graphics.blit(ResourceLocation.bySeparator("player2npc:textures/gui/largebg.png", ':'), (this.width-200)/2, (this.height-230)/2, 0, 0, 256, 256);
